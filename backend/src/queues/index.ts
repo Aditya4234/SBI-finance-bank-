@@ -4,8 +4,7 @@ import { logger } from '../config/logger';
 
 const redisConfig: Bull.QueueOptions = {
   redis: {
-    host: config.redis.url.replace('redis://', '').split(':')[0] || 'localhost',
-    port: parseInt(config.redis.url.split(':')[2] || '6379'),
+    url: config.redis.url,
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
   },

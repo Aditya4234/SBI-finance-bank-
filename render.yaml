@@ -28,21 +28,7 @@ services:
           name: sbi-redis
           property: connectionString
       - key: CORS_ORIGIN
-        value: https://sbi-frontend.onrender.com
-
-  - type: web
-    name: sbi-frontend
-    env: node
-    region: singapore
-    plan: free
-    buildCommand: cd frontend && npm ci --legacy-peer-deps && npm run build
-    startCommand: cd frontend && npm start
-    envVars:
-      - key: NEXT_PUBLIC_API_URL
-        value: https://sbi-backend.onrender.com/api
-    buildFilter:
-      paths:
-        - frontend/**
+        value: https://sbi-finance-bank.vercel.app
 
 databases:
   - name: sbi-personal-db

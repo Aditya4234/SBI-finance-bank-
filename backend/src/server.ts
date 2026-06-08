@@ -34,6 +34,24 @@ app.use('/api', routes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+  logger.error('Uncaught Exception:', err);
+  process.exit(1);
+});
+
+const gracefulShutdown = async (signal: string) => {
+  logger.info(`${signal} received. Shutting down...`);
+  await Promise.all([disconnectPersonalDb(), disconnectCorporateDb(), closeAllQueues()]);
+  process.exit(0);
+};
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
 const startServer = async () => {
   try {
     await connectPersonalDb();
@@ -41,7 +59,7 @@ const startServer = async () => {
     await startAllProcessors();
     registerEventHandlers();
 
-    app.listen(config.port, () => {
+    app.listen(config.port, '0.0.0.0', () => {
       logger.info(`Server running on port ${config.port} in ${config.nodeEnv} mode`);
       logger.info('Databases: Personal Banking + Corporate Banking');
       logger.info('Message broker queues initialized: email, transactions, audit, notifications, reports, kyc, loans');
@@ -53,18 +71,6 @@ const startServer = async () => {
     process.exit(1);
   }
 };
-
-process.on('SIGTERM', async () => {
-  logger.info('SIGTERM received. Shutting down...');
-  await Promise.all([disconnectPersonalDb(), disconnectCorporateDb(), closeAllQueues()]);
-  process.exit(0);
-});
-
-process.on('SIGINT', async () => {
-  logger.info('SIGINT received. Shutting down...');
-  await Promise.all([disconnectPersonalDb(), disconnectCorporateDb(), closeAllQueues()]);
-  process.exit(0);
-});
 
 startServer();
 
