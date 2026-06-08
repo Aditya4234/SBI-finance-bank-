@@ -12,8 +12,8 @@ RUN npx prisma generate --schema=prisma/schema.prisma
 RUN npx prisma generate --schema=prisma/schema-corporate.prisma
 
 COPY . .
-RUN npm run build
+RUN npm run build && chmod +x docker-start.sh
 
 EXPOSE 5000
 
-CMD ["node", "dist/server.js"]
+CMD ["sh", "docker-start.sh"]

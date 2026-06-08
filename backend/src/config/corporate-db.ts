@@ -12,14 +12,26 @@ export const getCorporateDb = (): PrismaClient => {
   return corporateClient;
 };
 
+const MAX_RETRIES = 5;
+const RETRY_DELAY_MS = 3000;
+
 export const connectCorporateDb = async (): Promise<void> => {
-  try {
-    const client = getCorporateDb();
-    await client.$connect();
-    logger.info('Corporate banking database connected');
-  } catch (error) {
-    logger.error('Corporate database connection error:', error);
-    process.exit(1);
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const client = getCorporateDb();
+      await client.$connect();
+      logger.info('Corporate banking database connected');
+      return;
+    } catch (error) {
+      logger.error(`Corporate database connection error (attempt ${attempt}/${MAX_RETRIES}):`, error);
+      if (attempt < MAX_RETRIES) {
+        logger.info(`Retrying in ${RETRY_DELAY_MS / 1000}s...`);
+        await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
+      } else {
+        logger.error('Max retries reached. Exiting.');
+        process.exit(1);
+      }
+    }
   }
 };
 

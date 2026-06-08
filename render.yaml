@@ -1,8 +1,11 @@
 services:
   - type: web
     name: sbi-backend
-    env: docker
-    dockerfilePath: ./backend/Dockerfile
+    env: node
+    region: singapore
+    plan: free
+    buildCommand: cd backend && npm ci && npx prisma generate --schema=prisma/schema.prisma && npx prisma generate --schema=prisma/schema-corporate.prisma && npm run build
+    startCommand: cd backend && npx prisma db push --schema=prisma/schema.prisma --accept-data-loss && npx prisma db push --schema=prisma/schema-corporate.prisma --accept-data-loss && node dist/server.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -29,8 +32,11 @@ services:
 
   - type: web
     name: sbi-frontend
-    env: docker
-    dockerfilePath: ./frontend/Dockerfile
+    env: node
+    region: singapore
+    plan: free
+    buildCommand: cd frontend && npm ci --legacy-peer-deps && npm run build
+    startCommand: cd frontend && npm start
     envVars:
       - key: NEXT_PUBLIC_API_URL
         value: https://sbi-backend.onrender.com/api
