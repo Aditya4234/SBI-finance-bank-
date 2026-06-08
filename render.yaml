@@ -1,0 +1,53 @@
+services:
+  - type: web
+    name: sbi-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DATABASE_PERSONAL_URL
+        fromDatabase:
+          name: sbi-personal-db
+          property: connectionString
+      - key: DATABASE_CORPORATE_URL
+        fromDatabase:
+          name: sbi-corporate-db
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: REDIS_URL
+        fromDatabase:
+          name: sbi-redis
+          property: connectionString
+      - key: CORS_ORIGIN
+        value: https://sbi-frontend.onrender.com
+
+  - type: web
+    name: sbi-frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://sbi-backend.onrender.com/api
+    buildFilter:
+      paths:
+        - frontend/**
+
+databases:
+  - name: sbi-personal-db
+    databaseName: sbi_personal
+    user: postgres
+    plan: free
+
+  - name: sbi-corporate-db
+    databaseName: sbi_corporate
+    user: postgres
+    plan: free
+
+  - name: sbi-redis
+    plan: free
