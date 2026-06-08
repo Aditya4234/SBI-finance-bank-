@@ -1,0 +1,46 @@
+import { Router } from 'express';
+import authRoutes from './auth.routes';
+import accountRoutes from './account.routes';
+import transactionRoutes from './transaction.routes';
+import loanRoutes from './loan.routes';
+import corporateRoutes from './corporate.routes';
+import adminRoutes from './admin.routes';
+import beneficiaryRoutes from './beneficiary.routes';
+import cardRoutes from './card.routes';
+import notificationRoutes from './notification.routes';
+import auditRoutes from './audit.routes';
+import queueRoutes from './queue.routes';
+import profileRoutes from './profile.routes';
+import healthRoutes from './health.routes';
+import depositRoutes from './deposit.routes';
+import standingInstructionRoutes from './standing-instruction.routes';
+import serviceRequestRoutes from './service-request.routes';
+import billPaymentRoutes from './bill-payment.routes';
+import chequeRoutes from './cheque.routes';
+import nriAccountRoutes from './nri-account.routes';
+import kycRoutes from './kyc.routes';
+
+const router = Router();
+
+router.use('/auth', authRoutes);
+router.use('/accounts', accountRoutes);
+router.use('/transactions', transactionRoutes);
+router.use('/loans', loanRoutes);
+router.use('/corporate', corporateRoutes);
+router.use('/admin', adminRoutes);
+router.use('/beneficiaries', beneficiaryRoutes);
+router.use('/cards', cardRoutes);
+router.use('/notifications', notificationRoutes);
+router.use('/audit-logs', auditRoutes);
+router.use('/queue', queueRoutes);
+router.use('/profile', profileRoutes);
+router.use('/health', healthRoutes);
+router.use('/deposits', depositRoutes);
+router.use('/standing-instructions', standingInstructionRoutes);
+router.use('/service-requests', serviceRequestRoutes);
+router.use('/bills', billPaymentRoutes);
+router.use('/cheques', chequeRoutes);
+router.use('/nri-accounts', nriAccountRoutes);
+router.use('/kyc', kycRoutes);
+
+export default router;

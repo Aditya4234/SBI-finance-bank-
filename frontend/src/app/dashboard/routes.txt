@@ -1,0 +1,9 @@
+personal: /dashboard (personal dashboard overview)
+admin: /dashboard/admin (admin panel)
+corporate: /dashboard/corporate (corporate dashboard)
+accounts: /dashboard/accounts
+transfer: /transfer
+loans: /loans
+beneficiaries: /beneficiaries
+profile: /profile
+auth: /auth/login, /auth/register, /auth/forgot-password

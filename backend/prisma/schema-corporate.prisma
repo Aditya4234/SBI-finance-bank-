@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/corporate-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_CORPORATE_URL")
+}
+
+enum CorporateAccountType {
+  CORPORATE_CURRENT
+  BUSINESS
+  ESCROW
+}
+
+enum TransactionType {
+  NEFT
+  RTGS
+  IMPS
+  UPI
+  WITHDRAWAL
+  DEPOSIT
+  BULK_PAYMENT
+  SALARY
+  VENDOR
+  GST
+  TAX
+  INTEREST
+  FEE
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REVERSED
+}
+
+model Company {
+  id                String   @id @default(uuid())
+  companyName       String
+  cinNumber         String   @unique
+  gstNumber         String   @unique
+  panNumber         String   @unique
+  businessType      String
+  registeredAddress Json?
+  authorizedSignatory Json?
+  isVerified        Boolean  @default(false)
+  kycStatus         String   @default("pending")
+  isActive          Boolean  @default(true)
+  adminId           String
+  employees         String[]
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  corporateAccounts CorporateAccount[]
+  transactions      CorporateTransaction[]
+
+  @@map("companies")
+}
+
+model CorporateAccount {
+  id                     String               @id @default(uuid())
+  companyId              String
+  accountNumber          String               @unique
+  ifscCode               String
+  accountType            CorporateAccountType
+  balance                Float                @default(0)
+  status                 String               @default("active")
+  branchName             String
+  branchCode             String
+  openingDate            DateTime             @default(now())
+  monthlyStatement       Boolean              @default(false)
+  corporateUpiEnabled    Boolean              @default(false)
+  dailyTransactionLimit  Float                @default(5000000)
+  monthlyTransactionLimit Float               @default(100000000)
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("corporate_accounts")
+}
+
+model CorporateTransaction {
+  id              String            @id @default(uuid())
+  transactionId   String            @unique
+  companyId       String
+  fromAccount     String
+  toAccount       String
+  toIfsc          String?
+  toName          String
+  amount          Float
+  transactionType TransactionType
+  status          TransactionStatus @default(PENDING)
+  description     String?
+  reference       String?
+  isInternal      Boolean           @default(false)
+  fee             Float             @default(0)
+  balanceBefore   Float?
+  balanceAfter    Float?
+  paymentDate     DateTime          @default(now())
+  processedDate   DateTime?
+  approvedBy      String?
+  approvalStatus  String?
+  ipAddress       String?
+  deviceId        String?
+  metadata        Json?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("corporate_transactions")
+}

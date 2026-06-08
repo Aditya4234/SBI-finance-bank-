@@ -1,0 +1,557 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/personal-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_PERSONAL_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  BANK_ADMIN
+  CORPORATE_ADMIN
+  FINANCE_MANAGER
+  EMPLOYEE
+  PERSONAL_CUSTOMER
+}
+
+enum AccountType {
+  SAVINGS
+  CURRENT
+  SALARY
+  FIXED_DEPOSIT
+  RECURRING_DEPOSIT
+  NRE
+  NRO
+  FCNR
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+  FROZEN
+  CLOSED
+}
+
+enum CardType {
+  DEBIT
+  CREDIT
+}
+
+enum CardStatus {
+  ACTIVE
+  BLOCKED
+  EXPIRED
+  CANCELLED
+}
+
+enum TransactionType {
+  NEFT
+  RTGS
+  IMPS
+  UPI
+  WITHDRAWAL
+  DEPOSIT
+  BULK_PAYMENT
+  SALARY
+  VENDOR
+  GST
+  TAX
+  INTEREST
+  FEE
+  BILL_PAYMENT
+  RECHARGE
+  CHEQUE
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REVERSED
+}
+
+enum LoanType {
+  PERSONAL
+  HOME
+  CAR
+  EDUCATION
+  BUSINESS
+  GOLD
+  MORTGAGE
+  OVERDRAFT
+}
+
+enum LoanStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  DISBURSED
+  CLOSED
+  DEFAULTED
+}
+
+enum KycType {
+  AADHAAR
+  PAN
+  PASSPORT
+  DRIVING_LICENSE
+  VOTER_ID
+  COMPANY_REGISTRATION
+  GST_CERTIFICATE
+}
+
+enum KycStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum NotificationType {
+  TRANSACTION
+  KYC
+  LOAN
+  ACCOUNT
+  SECURITY
+  PROMOTIONAL
+  SYSTEM
+}
+
+enum AuditAction {
+  LOGIN
+  LOGOUT
+  REGISTER
+  TRANSACTION
+  ACCOUNT_OPEN
+  ACCOUNT_CLOSE
+  KYC_SUBMIT
+  KYC_APPROVE
+  LOAN_APPLY
+  LOAN_APPROVE
+  PASSWORD_CHANGE
+  PROFILE_UPDATE
+  BENEFICIARY_ADD
+  BENEFICIARY_REMOVE
+  CARD_BLOCK
+  CARD_UNBLOCK
+  BULK_PAYMENT
+  ROLE_CHANGE
+  FREEZE_ACCOUNT
+  UNFREEZE_ACCOUNT
+  SETTINGS_CHANGE
+  BILL_PAYMENT
+  CHEQUE_BOOK_REQUEST
+  CHEQUE_STOP_PAYMENT
+  ACCOUNT_CLOSURE
+  NRI_ACCOUNT_OPEN
+}
+
+model User {
+  id                      String    @id @default(uuid())
+  fullName                String
+  email                   String    @unique
+  mobile                  String    @unique
+  password                String
+  role                    UserRole  @default(PERSONAL_CUSTOMER)
+  isVerified              Boolean   @default(false)
+  isActive                Boolean   @default(true)
+  isKycCompleted          Boolean   @default(false)
+  twoFactorEnabled        Boolean   @default(false)
+  twoFactorSecret         String?
+  refreshTokens           String[]
+  profileImage            String?
+  lastLogin               DateTime?
+  loginAttempts           Int       @default(0)
+  lockUntil               DateTime?
+  passwordChangedAt       DateTime?
+  passwordResetToken      String?
+  passwordResetExpires    DateTime?
+  verificationToken       String?
+  verificationTokenExpires DateTime?
+  companyId               String?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  personalAccounts PersonalAccount[]
+  transactions     Transaction[]
+  beneficiaries    Beneficiary[]
+  cards            Card[]
+  loans            Loan[]
+  kycDocuments     KycDocument[]
+  notifications    Notification[]
+  auditLogs        AuditLog[]
+  deviceInfo       DeviceInfo[]
+
+  @@map("users")
+}
+
+model DeviceInfo {
+  id         String   @id @default(uuid())
+  userId     String
+  deviceId   String
+  deviceName String
+  ip         String
+  userAgent  String
+  lastUsed   DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("device_info")
+}
+
+model PersonalAccount {
+  id                String        @id @default(uuid())
+  userId            String
+  accountNumber     String        @unique
+  ifscCode          String
+  accountType       AccountType
+  status            AccountStatus @default(ACTIVE)
+  balance           Float         @default(0)
+  branchName        String
+  branchCode        String
+  nomineeName       String?
+  nomineeRelation   String?
+  openingDate       DateTime      @default(now())
+  closedDate        DateTime?
+  monthlyStatement  Boolean       @default(false)
+  upiEnabled        Boolean       @default(false)
+  debitCardId       String?   @unique
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  user        User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  debitCard   Card?  @relation("DebitCard", fields: [debitCardId], references: [id])
+  creditCards Card[] @relation("CreditCards")
+
+  @@map("personal_accounts")
+}
+
+model Transaction {
+  id              String            @id @default(uuid())
+  transactionId   String            @unique
+  userId          String?
+  companyId       String?
+  fromAccount     String
+  toAccount       String
+  toIfsc          String?
+  toName          String
+  amount          Float
+  transactionType TransactionType
+  status          TransactionStatus @default(PENDING)
+  description     String?
+  reference       String?
+  beneficiaryId   String?
+  isInternal      Boolean           @default(false)
+  fee             Float             @default(0)
+  balanceBefore   Float?
+  balanceAfter    Float?
+  paymentDate     DateTime          @default(now())
+  processedDate   DateTime?
+  approvedBy      String?
+  approvalStatus  String?
+  ipAddress       String?
+  deviceId        String?
+  metadata        Json?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  user        User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  beneficiary Beneficiary? @relation(fields: [beneficiaryId], references: [id], onDelete: SetNull)
+
+  @@map("transactions")
+}
+
+model Beneficiary {
+  id             String   @id @default(uuid())
+  userId         String
+  name           String
+  accountNumber  String
+  ifscCode       String
+  bankName       String
+  isVerified     Boolean  @default(false)
+  transferLimit  Float    @default(100000)
+  nickname       String?
+  email          String?
+  mobile         String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@map("beneficiaries")
+}
+
+model Card {
+  id                     String     @id @default(uuid())
+  userId                 String
+  accountId              String?
+  cardNumber             String     @unique
+  cardType               CardType
+  status                 CardStatus @default(ACTIVE)
+  cardHolderName         String
+  expiryDate             DateTime
+  cvv                    String
+  cardNetwork            String
+  dailyLimit             Float      @default(50000)
+  monthlyLimit           Float      @default(500000)
+  domesticLimit          Float      @default(100000)
+  internationalLimit     Float      @default(50000)
+  isInternationalEnabled Boolean    @default(false)
+  isContactlessEnabled   Boolean    @default(true)
+  pinSet                 Boolean    @default(false)
+  creditLimit            Float?
+  availableCredit        Float?
+  outstandingAmount      Float?     @default(0)
+  billingDate            DateTime?
+  dueDate                DateTime?
+  createdAt              DateTime   @default(now())
+  updatedAt              DateTime   @updatedAt
+
+  user          User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  debitAccount  PersonalAccount?  @relation("DebitCard")
+  creditAccount PersonalAccount[] @relation("CreditCards")
+
+  @@map("cards")
+}
+
+model Loan {
+  id             String     @id @default(uuid())
+  userId         String
+  loanType       LoanType
+  amount         Float
+  tenure         Int
+  interestRate   Float
+  status         LoanStatus @default(PENDING)
+  purpose        String?
+  monthlyEmi     Float      @default(0)
+  totalInterest  Float      @default(0)
+  totalPayable   Float      @default(0)
+  amountPaid     Float      @default(0)
+  emiRemaining   Int        @default(0)
+  disbursedDate  DateTime?
+  closureDate    DateTime?
+  documents      Json?
+  guarantor      Json?
+  collateral     Json?
+  approvedBy     String?
+  remarks        String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("loans")
+}
+
+model KycDocument {
+  id                String    @id @default(uuid())
+  userId            String
+  kycType           KycType
+  documentNumber    String
+  frontImage        String
+  backImage         String?
+  selfieImage       String?
+  status            KycStatus @default(PENDING)
+  remarks           String?
+  verifiedBy        String?
+  verifiedAt        DateTime?
+  expiresAt         DateTime?
+  isCompanyDocument Boolean   @default(false)
+  companyId         String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("kyc_documents")
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  metadata  Json?
+  createdAt DateTime         @default(now())
+  expiresAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model AuditLog {
+  id         String     @id @default(uuid())
+  userId     String
+  action     AuditAction
+  resource   String
+  resourceId String?
+  details    Json?
+  ipAddress  String
+  userAgent  String
+  deviceId   String?
+  status     String
+  metadata   Json?
+  createdAt  DateTime   @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+}
+
+model FixedDeposit {
+  id            String   @id @default(uuid())
+  userId        String
+  accountId     String
+  fdNumber      String   @unique
+  amount        Float
+  interestRate  Float
+  tenure        Int       // in months
+  maturityAmount Float
+  maturityDate  DateTime
+  status        String   @default("ACTIVE") // ACTIVE, MATURED, CLOSED, PREMATURE_CLOSED
+  nomineeName   String?
+  nomineeRelation String?
+  bookedDate    DateTime @default(now())
+  maturityPaidDate DateTime?
+  closedDate    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("fixed_deposits")
+}
+
+model RecurringDeposit {
+  id            String   @id @default(uuid())
+  userId        String
+  accountId     String
+  rdNumber      String   @unique
+  monthlyAmount Float
+  interestRate  Float
+  tenure        Int       // in months
+  totalDeposits Float    @default(0)
+  maturityAmount Float
+  maturityDate  DateTime
+  status        String   @default("ACTIVE") // ACTIVE, MATURED, CLOSED, DEFAULTED
+  installmentsPaid Int   @default(0)
+  lastPaidDate  DateTime?
+  nomineeName   String?
+  nomineeRelation String?
+  startDate     DateTime @default(now())
+  maturityPaidDate DateTime?
+  closedDate    DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("recurring_deposits")
+}
+
+model StandingInstruction {
+  id              String   @id @default(uuid())
+  userId          String
+  fromAccount     String
+  toAccount       String
+  toIfsc          String?
+  toName          String
+  amount          Float
+  frequency       String   // DAILY, WEEKLY, MONTHLY, QUARTERLY, YEARLY
+  startDate       DateTime
+  endDate         DateTime?
+  nextExecution   DateTime
+  lastExecuted    DateTime?
+  description     String?
+  status          String   @default("ACTIVE") // ACTIVE, PAUSED, COMPLETED, CANCELLED
+  maxOccurrences  Int?
+  occurrencesCompleted Int @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("standing_instructions")
+}
+
+model ServiceRequest {
+  id          String   @id @default(uuid())
+  userId      String
+  category    String   // CHEQUE_BOOK, ATM_CARD, ACCOUNT_STATEMENT, ADDRESS_CHANGE, PHONE_UPDATE, EMAIL_UPDATE, TECHNICAL_ISSUE, COMPLAINT, OTHERS
+  subject     String
+  description String
+  priority    String   @default("MEDIUM") // LOW, MEDIUM, HIGH, URGENT
+  status      String   @default("PENDING") // PENDING, IN_PROGRESS, RESOLVED, CLOSED, REJECTED
+  attachments String[]  // URLs
+  assignedTo  String?
+  resolution  String?
+  resolvedAt  DateTime?
+  closedAt    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("service_requests")
+}
+
+model BillPayment {
+  id              String        @id @default(uuid())
+  userId          String
+  fromAccount     String
+  billType        String        // ELECTRICITY, WATER, GAS, BROADBAND, CREDIT_CARD, INSURANCE, MUTUAL_FUND, LOAN_EMI, TAX, OTHERS
+  billerName      String
+  billerAccount   String
+  amount          Float
+  reference       String?       // bill reference number
+  transactionId   String?       // linked transaction ID after payment
+  status          String        @default("PENDING") // PENDING, PAID, FAILED, REFUNDED
+  scheduledDate   DateTime?
+  paidDate        DateTime?
+  isRecurring     Boolean       @default(false)
+  frequency       String?       // MONTHLY, QUARTERLY, etc. (for recurring)
+  paymentMethod   String        @default("ACCOUNT") // ACCOUNT, CARD, UPI
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("bill_payments")
+}
+
+model ChequeBook {
+  id              String        @id @default(uuid())
+  userId          String
+  accountId       String
+  bookNumber      String        @unique
+  leafCount       Int           @default(25)
+  startLeaf       Int
+  endLeaf         Int
+  status          String        @default("REQUESTED") // REQUESTED, APPROVED, DISPATCHED, DELIVERED, CANCELLED
+  requestDate     DateTime      @default(now())
+  dispatchDate    DateTime?
+  deliveryDate    DateTime?
+  branchName      String
+  remarks         String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  chequeLeaves    ChequeLeaf[]
+
+  @@map("cheque_books")
+}
+
+model ChequeLeaf {
+  id              String        @id @default(uuid())
+  chequeBookId    String
+  leafNumber      Int
+  issuedTo        String?
+  issuedDate      DateTime?
+  amount          Float?
+  status          String        @default("UNUSED") // UNUSED, ISSUED, PAID, BOUNCED, STOPPED, CANCELLED
+  stopDate        DateTime?
+  stopReason      String?
+  clearedDate     DateTime?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  chequeBook      ChequeBook    @relation(fields: [chequeBookId], references: [id], onDelete: Cascade)
+
+  @@map("cheque_leaves")
+}
