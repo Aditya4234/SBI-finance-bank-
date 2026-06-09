@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAppSelector } from '@/store/hooks';
@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { accountApi, transactionApi, loanApi } from '@/services/api';
 import { formatCurrency, maskCardNumber, cn } from '@/lib/utils';
+import { useToast } from '@/components/ui/toaster';
 import {
   Wallet, ArrowUpRight, ArrowDownLeft, PiggyBank, TrendingUp, Landmark, Building2,
   Shield, Eye, EyeOff, Zap, FileText, Download, CircleDollarSign,
@@ -458,7 +459,33 @@ function CreditCardSection() {
 // ────────────── UPI SECTION ──────────────
 
 function UPISection() {
-  const [amount, setAmount] = useState('');
+  const [recipient, setRecipient] = useState('');
+  const [sendAmount, setSendAmount] = useState('');
+  const { addToast } = useToast();
+  const router = useRouter();
+  const transferMutation = useMutation({
+    mutationFn: (data: any) => transactionApi.transfer(data),
+    onSuccess: () => {
+      addToast({ title: 'Payment sent successfully', variant: 'success' });
+      setRecipient('');
+      setSendAmount('');
+    },
+    onError: (err: any) => {
+      addToast({ title: err.response?.data?.message || 'Transfer failed', variant: 'error' });
+    },
+  });
+  const handleSendNow = () => {
+    if (!recipient) {
+      addToast({ title: 'Please enter a UPI ID or account number', variant: 'error' });
+      return;
+    }
+    const amt = parseFloat(sendAmount.replace(/[₹,]/g, ''));
+    if (!amt || amt <= 0) {
+      addToast({ title: 'Please select or enter a valid amount', variant: 'error' });
+      return;
+    }
+    transferMutation.mutate({ toAccount: recipient, amount: amt, description: 'UPI Payment' });
+  };
   return (
     <div className="grid sm:grid-cols-3 gap-3 sm:gap-4">
       {/* QR Code */}
@@ -487,18 +514,23 @@ function UPISection() {
             <p className="text-[10px] text-sbi-400 dark:text-sbi-500">Instant UPI Transfer</p>
           </div>
         </div>
-        <Input placeholder="Enter UPI ID / Mobile / Account" value={amount} onChange={(e) => setAmount(e.target.value)}
+        <Input placeholder="Enter UPI ID / Mobile / Account" value={recipient} onChange={(e) => setRecipient(e.target.value)}
           className="h-9 text-xs rounded-xl border-sbi-200 dark:border-sbi-700 bg-white/80 dark:bg-sbi-800/80 mb-3" />
         <div className="grid grid-cols-3 gap-1.5 mb-3">
           {['₹500', '₹1,000', '₹2,000', '₹5,000', '₹10,000', '₹25,000'].map((v) => (
-            <button key={v} onClick={() => setAmount(v)}
-              className="py-1.5 text-[9px] font-medium rounded-lg border border-sbi-200 dark:border-sbi-700 text-sbi-600 dark:text-sbi-400 hover:bg-sbi-50 dark:hover:bg-sbi-800 transition-colors">
+            <button key={v} onClick={() => setSendAmount(v)}
+              className={cn('py-1.5 text-[9px] font-medium rounded-lg border transition-colors',
+                sendAmount === v
+                  ? 'bg-purple-600 text-white border-purple-600'
+                  : 'border-sbi-200 dark:border-sbi-700 text-sbi-600 dark:text-sbi-400 hover:bg-sbi-50 dark:hover:bg-sbi-800'
+              )}>
               {v}
             </button>
           ))}
         </div>
-        <Button className="w-full h-9 text-xs font-semibold rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white">
-          <Send className="h-3.5 w-3.5 mr-1.5" /> Send Now
+        <Button onClick={handleSendNow} disabled={transferMutation.isPending}
+          className="w-full h-9 text-xs font-semibold rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white disabled:opacity-50">
+          {transferMutation.isPending ? 'Sending...' : <><Send className="h-3.5 w-3.5 mr-1.5" /> Send Now</>}
         </Button>
       </GlassCard>
 
@@ -515,19 +547,24 @@ function UPISection() {
         </div>
         <div className="space-y-2">
           {[
-            { icon: ScanLine, label: 'Scan & Pay', color: 'from-blue-500 to-blue-600', href: '#' },
-            { icon: ArrowUpDown, label: 'Request Money', color: 'from-purple-500 to-purple-600', href: '#' },
-            { icon: Users, label: 'Manage UPI ID', color: 'from-cyan-500 to-cyan-600', href: '#' },
-            { icon: RefreshCw, label: 'Check Balance', color: 'from-emerald-500 to-emerald-600', href: '#' },
+            { icon: ScanLine, label: 'Scan & Pay', color: 'from-blue-500 to-blue-600', action: 'scan' },
+            { icon: ArrowUpDown, label: 'Request Money', color: 'from-purple-500 to-purple-600', action: 'request' },
+            { icon: Users, label: 'Manage UPI ID', color: 'from-cyan-500 to-cyan-600', action: 'manage' },
+            { icon: RefreshCw, label: 'Check Balance', color: 'from-emerald-500 to-emerald-600', action: 'balance' },
           ].map((a) => (
-            <Link key={a.label} href={a.href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-sbi-50 dark:hover:bg-sbi-800/50 transition-all group">
+            <button key={a.label} onClick={() => {
+              if (a.action === 'scan') router.push('/bills');
+              else if (a.action === 'request') router.push('/transfer');
+              else if (a.action === 'manage') router.push('/dashboard/accounts');
+              else if (a.action === 'balance') router.push('/dashboard/accounts');
+            }}
+              className="flex w-full items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-sbi-50 dark:hover:bg-sbi-800/50 transition-all group">
               <div className={cn('rounded-lg p-1.5 text-white bg-gradient-to-br', a.color)}>
                 <a.icon className="h-3.5 w-3.5" />
               </div>
               <span className="text-xs font-medium text-sbi-700 dark:text-sbi-300">{a.label}</span>
               <ChevronRight className="h-3 w-3 ml-auto text-sbi-300 dark:text-sbi-600" />
-            </Link>
+            </button>
           ))}
         </div>
       </GlassCard>
