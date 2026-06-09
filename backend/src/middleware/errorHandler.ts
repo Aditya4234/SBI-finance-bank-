@@ -2,8 +2,21 @@ import { Request, Response, NextFunction } from 'express';
 import { logger } from '../config/logger';
 import { AppError } from '../utils/errors';
 import { ApiResponse } from '../types';
+import { config } from '../config';
+
+function setCorsHeaders(req: Request, res: Response) {
+  const origin = req.headers.origin;
+  if (origin && (config.corsOrigins.includes(origin) || config.nodeEnv === 'development')) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', config.corsAllowedMethods.join(', '));
+    res.setHeader('Access-Control-Allow-Headers', config.corsAllowedHeaders.join(', '));
+    res.setHeader('Access-Control-Expose-Headers', config.corsExposedHeaders.join(', '));
+  }
+}
 
 export const errorHandler = (err: Error, req: Request, res: Response<ApiResponse>, _next: NextFunction) => {
+  setCorsHeaders(req, res);
   logger.error('Error:', err);
 
   if (err instanceof AppError) {
@@ -44,6 +57,7 @@ export const errorHandler = (err: Error, req: Request, res: Response<ApiResponse
 };
 
 export const notFoundHandler = (req: Request, res: Response) => {
+  setCorsHeaders(req, res);
   res.status(404).json({
     success: false,
     message: 'Route not found',

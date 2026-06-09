@@ -19,32 +19,7 @@ import { registerEventHandlers } from './events/handlers';
 
 const app = express();
 
-// --- CORS header injection at the HTTP layer (catches EVERY response) ---
-function corsHeaderMiddleware(req: Request, res: Response, next: NextFunction) {
-  const origin = req.headers.origin;
-  const setCorsHeaders = () => {
-    if (origin && config.corsOrigins.includes(origin)) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
-      res.setHeader('Access-Control-Allow-Credentials', 'true');
-    } else if (config.nodeEnv === 'development' && origin) {
-      res.setHeader('Access-Control-Allow-Origin', origin);
-      res.setHeader('Access-Control-Allow-Credentials', 'true');
-    }
-    res.setHeader('Access-Control-Allow-Methods', config.corsAllowedMethods.join(', '));
-    res.setHeader('Access-Control-Allow-Headers', config.corsAllowedHeaders.join(', '));
-    res.setHeader('Access-Control-Expose-Headers', config.corsExposedHeaders.join(', '));
-  };
-  const _originalWriteHead = res.writeHead.bind(res) as any;
-  res.writeHead = function (statusCode: number, ...args: any[]) {
-    setCorsHeaders();
-    return _originalWriteHead(statusCode, ...args);
-  };
-  next();
-}
-
-app.use(corsHeaderMiddleware);
-
-// --- CORS package (handles OPTIONS preflight and origin validation) ---
+// --- CORS ---
 const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
     if (!origin || config.corsOrigins.includes(origin) || config.nodeEnv === 'development') {
@@ -61,9 +36,6 @@ const corsOptions: cors.CorsOptions = {
 };
 
 app.use(cors(corsOptions));
-
-// Explicit global OPTIONS handler for preflight requests
-app.options('*', cors(corsOptions));
 
 // --- Security headers ---
 app.use(helmet());
