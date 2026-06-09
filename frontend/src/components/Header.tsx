@@ -518,10 +518,12 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
                     <Link href="/auth/login">Login</Link>
                   </Button>
                   <Button asChild size="sm" className="h-9 text-xs font-semibold rounded-xl px-5 bg-gradient-to-r from-premium-blue via-premium-blue to-premium-dark text-white shadow-lg shadow-premium-blue/25 hover:shadow-xl hover:shadow-premium-blue/30 hover:scale-105 active:scale-95 transition-all duration-200 hover:from-premium-blue hover:to-premium-dark relative overflow-hidden group/cta">
-                    <span className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent_60%)] opacity-0 group-hover/cta:opacity-100 transition-opacity duration-300" />
-                    <Link href="/auth/register" className="relative z-10 flex items-center gap-1.5">
-                      Open Account
-                      <Sparkles className="h-3 w-3 opacity-70 group-hover/cta:opacity-100 group-hover/cta:rotate-12 transition-all duration-300" />
+                    <Link href="/auth/register" className="relative flex items-center gap-1.5">
+                      <span className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent_60%)] opacity-0 group-hover/cta:opacity-100 transition-opacity duration-300" />
+                      <span className="relative z-10 flex items-center gap-1.5">
+                        Open Account
+                        <Sparkles className="h-3 w-3 opacity-70 group-hover/cta:opacity-100 group-hover/cta:rotate-12 transition-all duration-300" />
+                      </span>
                     </Link>
                   </Button>
                 </>
