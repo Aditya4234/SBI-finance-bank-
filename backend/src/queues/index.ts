@@ -1,10 +1,14 @@
 import Bull from 'bull';
+import { URL } from 'url';
 import { config } from '../config';
 import { logger } from '../config/logger';
 
+const redisUrl = new URL(config.redis.url);
 const redisConfig: Bull.QueueOptions = {
   redis: {
-    url: config.redis.url,
+    host: redisUrl.hostname || 'localhost',
+    port: parseInt(redisUrl.port || '6379', 10),
+    password: redisUrl.password || undefined,
     maxRetriesPerRequest: null,
     enableReadyCheck: false,
   },
