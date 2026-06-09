@@ -54,6 +54,16 @@ app.use(requestLogger);
 app.use('/api', apiLimiter);
 app.use('/api', routes);
 
+// --- Root route ---
+app.get('/', (_req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: 'SBI Finance Bank API is running',
+    docs: '/api/health',
+    frontend: 'https://sbi-finance-bank.vercel.app',
+  });
+});
+
 // --- Error handling (last) ---
 app.use(notFoundHandler);
 app.use(errorHandler);

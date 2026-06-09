@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc && rm -rf dist/generated && cp -r generated dist/generated",
+    "build": "prisma generate --schema=prisma/schema.prisma && prisma generate --schema=prisma/schema-corporate.prisma && tsc && rm -rf dist/generated && cp -r generated dist/generated",
     "start": "node dist/server.js",
     "lint": "eslint src --ext .ts",
     "seed": "tsx src/scripts/seed.ts",
