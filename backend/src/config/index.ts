@@ -30,5 +30,6 @@ export const config = {
     from: process.env.EMAIL_FROM || 'noreply@sbi.com',
   },
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  corsOrigins: (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',').map(s => s.trim()),
   encryptionKey: process.env.ENCRYPTION_KEY || 'default-encryption-key-32chr',
 };
