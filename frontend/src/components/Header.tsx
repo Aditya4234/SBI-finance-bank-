@@ -186,10 +186,12 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
 
   const showMega = (item: typeof NAV_ITEMS[number]) => item.megaMenu && activeMega === item.label;
 
+  const iconBtnClass = 'flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl text-gray-400 dark:text-gray-500 hover:text-premium-blue dark:hover:text-premium-gold hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 active:scale-90 transition-all duration-200';
+
   if (!mounted) {
     return (
       <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md">
-        <div className="mx-auto flex h-20 max-w-[1400px] items-center justify-between px-8" />
+        <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 sm:px-6 lg:px-8" />
       </header>
     );
   }
@@ -199,28 +201,27 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
       <header
         ref={headerRef}
         className={cn(
-          'group/header sticky top-0 z-50 w-full transition-all duration-500',
+          'group/header sticky top-0 z-50 w-full transition-all duration-300',
           scrolled
             ? 'bg-white/85 dark:bg-slate-900/85 backdrop-blur-2xl shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_32px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_2px_rgba(0,0,0,0.2),0_8px_32px_rgba(0,0,0,0.3)] border-b border-premium-blue/5 dark:border-white/5'
             : 'bg-white/95 dark:bg-slate-900/95 border-b border-transparent'
         )}
       >
-        {/* Top accent line */}
         <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-premium-blue via-premium-gold to-premium-blue opacity-60" />
 
-        <div className="mx-auto flex h-20 max-w-[1400px] items-center justify-between px-8">
+        <div className="mx-auto flex h-16 max-w-[1400px] items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Left: Logo */}
           <Link
             href={isAuthenticated && isOnDashboard ? '/dashboard' : '/'}
-            className="flex items-center gap-3 shrink-0 group/logo relative"
+            className="flex items-center gap-2 sm:gap-3 shrink-0 group/logo relative"
           >
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-premium-blue via-premium-blue to-premium-dark text-white font-bold text-xs shadow-lg shadow-premium-blue/20 group-hover/logo:shadow-xl group-hover/logo:shadow-premium-blue/30 group-hover/logo:scale-105 transition-all duration-300">
+            <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-premium-blue via-premium-blue to-premium-dark text-white font-bold text-[11px] sm:text-xs shadow-lg shadow-premium-blue/20 group-hover/logo:shadow-xl group-hover/logo:shadow-premium-blue/30 group-hover/logo:scale-105 transition-all duration-300">
               <span className="relative z-10 tracking-tight">SBI</span>
               <div className="absolute inset-0 rounded-xl bg-white/0 group-hover/logo:bg-white/10 transition-colors" />
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="text-base font-bold text-premium-dark dark:text-white tracking-tight">SBI Finance</span>
-              <span className="text-[10px] font-medium text-gray-400 dark:text-gray-500 -mt-0.5 tracking-wide">
+              <span className="text-sm sm:text-base font-bold text-premium-dark dark:text-white tracking-tight">SBI Finance</span>
+              <span className="hidden sm:block text-[9px] sm:text-[10px] font-medium text-gray-400 dark:text-gray-500 -mt-0.5 tracking-wide">
                 State Bank of India
               </span>
             </div>
@@ -242,7 +243,7 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
                   <Link
                     href={item.href}
                     className={cn(
-                      'relative flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300 group/link',
+                      'relative flex items-center gap-1.5 px-2.5 xl:px-4 py-2 text-sm font-medium rounded-xl transition-all duration-300 group/link whitespace-nowrap',
                       active || megaOpen
                         ? 'text-premium-blue dark:text-premium-gold'
                         : 'text-gray-600 dark:text-gray-300 hover:text-premium-blue dark:hover:text-premium-gold'
@@ -252,14 +253,14 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
                       'h-4 w-4 transition-all duration-300',
                       (active || megaOpen) && 'scale-110'
                     )} />
-                    {item.label}
+                    <span className="hidden xl:inline">{item.label}</span>
+                    <span className="xl:hidden">{item.label}</span>
                     {hasMega && (
                       <ChevronDown className={cn(
                         'h-3 w-3 transition-all duration-300',
                         megaOpen && 'rotate-180 translate-y-0.5'
                       )} />
                     )}
-                    {/* Active indicator */}
                     <span className={cn(
                       'absolute -bottom-[5px] left-1/2 -translate-x-1/2 h-[3px] rounded-full transition-all duration-300',
                       active
@@ -327,8 +328,8 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
           </nav>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-2">
-            {/* Secure Badge (desktop) */}
+          <div className="flex items-center gap-1 sm:gap-2">
+            {/* Secure Badge (xl only) */}
             <div className="hidden xl:flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/30 group/badge hover:bg-emerald-100 dark:hover:bg-emerald-950/50 transition-colors duration-200">
               <div className="relative">
                 <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
@@ -342,25 +343,27 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
               </div>
             </div>
 
-            {/* Search */}
+            {/* Search - always visible */}
             <button
               onClick={() => setSearchOpen(true)}
               aria-label="Search"
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-gray-400 dark:text-gray-500 hover:text-premium-blue dark:hover:text-premium-gold hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 active:scale-90 transition-all duration-200"
+              className={iconBtnClass}
             >
               <Search className="h-[18px] w-[18px]" />
             </button>
 
-            {/* Theme toggle */}
-            <button
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-              className="flex h-10 w-10 items-center justify-center rounded-xl text-gray-400 dark:text-gray-500 hover:text-premium-blue dark:hover:text-premium-gold hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 active:scale-90 transition-all duration-200"
-            >
-              <div className="relative">
-                {theme === 'dark' ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
-              </div>
-            </button>
+            {/* Theme toggle - desktop only */}
+            <div className="hidden lg:flex">
+              <button
+                onClick={toggleTheme}
+                aria-label="Toggle theme"
+                className={iconBtnClass}
+              >
+                <div className="relative">
+                  {theme === 'dark' ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
+                </div>
+              </button>
+            </div>
 
             {/* Notifications */}
             {isAuthenticated && (
@@ -368,7 +371,7 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
                 <button
                   onClick={() => setNotifOpen((prev) => !prev)}
                   aria-label="Notifications"
-                  className="relative flex h-10 w-10 items-center justify-center rounded-xl text-gray-400 dark:text-gray-500 hover:text-premium-blue dark:hover:text-premium-gold hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 active:scale-90 transition-all duration-200"
+                  className={cn(iconBtnClass, 'relative')}
                 >
                   {unreadCount > 0 ? (
                     <BellDot className="h-[18px] w-[18px]" />
@@ -383,7 +386,7 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
                 </button>
 
                 {notifOpen && (
-                  <div className="absolute right-0 mt-3 w-[380px] rounded-2xl border border-gray-100 dark:border-slate-700/50 bg-white dark:bg-slate-800 shadow-2xl shadow-gray-900/10 dark:shadow-black/30 overflow-hidden">
+                  <div className="absolute right-0 mt-3 w-[380px] rounded-2xl border border-gray-100 dark:border-slate-700/50 bg-white dark:bg-slate-800 shadow-2xl shadow-gray-900/10 dark:shadow-black/30 overflow-hidden max-sm:fixed max-sm:inset-x-4 max-sm:w-auto max-sm:mt-2">
                     <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 dark:border-slate-700/50">
                       <div className="flex items-center gap-2.5">
                         <div className="rounded-lg p-1.5 bg-premium-blue/10 dark:bg-premium-blue/20">
@@ -463,94 +466,87 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
               </div>
             )}
 
-            {/* Profile / Auth */}
-            {isAuthenticated && user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setProfileOpen(!profileOpen)}
-                  aria-label="Profile menu"
-                  className="flex items-center gap-2 rounded-xl p-1.5 pr-2.5 hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 active:scale-95 transition-all duration-200"
-                >
-                  <Avatar className="h-8 w-8 ring-2 ring-premium-blue/20 dark:ring-premium-gold/30 ring-offset-2 ring-offset-white dark:ring-offset-slate-900">
-                    <AvatarFallback className="bg-gradient-to-br from-premium-blue to-premium-dark text-white text-[10px] font-semibold">
-                      {getInitials(user.fullName)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <ChevronDown className={cn(
-                    'hidden sm:block h-3.5 w-3.5 text-gray-400 dark:text-gray-500 transition-transform duration-300',
-                    profileOpen && 'rotate-180'
-                  )} />
-                </button>
+            {/* Profile / Auth - desktop only */}
+            <div className="hidden lg:flex items-center gap-2">
+              {isAuthenticated && user ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setProfileOpen(!profileOpen)}
+                    aria-label="Profile menu"
+                    className="flex items-center gap-2 rounded-xl p-1.5 pr-2.5 hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 active:scale-95 transition-all duration-200"
+                  >
+                    <Avatar className="h-8 w-8 ring-2 ring-premium-blue/20 dark:ring-premium-gold/30 ring-offset-2 ring-offset-white dark:ring-offset-slate-900">
+                      <AvatarFallback className="bg-gradient-to-br from-premium-blue to-premium-dark text-white text-[10px] font-semibold">
+                        {getInitials(user.fullName)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <ChevronDown className={cn(
+                      'h-3.5 w-3.5 text-gray-400 dark:text-gray-500 transition-transform duration-300',
+                      profileOpen && 'rotate-180'
+                    )} />
+                  </button>
 
-                {profileOpen && (
-                  <div className="absolute right-0 mt-2.5 w-56 rounded-2xl border border-gray-100 dark:border-slate-700/50 bg-white dark:bg-slate-800 shadow-2xl shadow-gray-900/10 dark:shadow-black/30 py-2 overflow-hidden">
-                    <div className="px-4 py-3.5 border-b border-gray-100 dark:border-slate-700/50">
-                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{user.fullName}</p>
-                      <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate mt-0.5">{user.email}</p>
-                    </div>
-                    <Link
-                      href="/profile"
-                      onClick={() => setProfileOpen(false)}
-                      className="flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 hover:text-premium-blue dark:hover:text-premium-gold transition-colors"
-                    >
-                      <User className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                      Profile Settings
-                    </Link>
-                    <div className="border-t border-gray-50 dark:border-slate-700/30 mt-1 pt-1">
-                      <button
-                        onClick={handleLogout}
-                        className="flex w-full items-center gap-3 px-4 py-2.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                  {profileOpen && (
+                    <div className="absolute right-0 mt-2.5 w-56 rounded-2xl border border-gray-100 dark:border-slate-700/50 bg-white dark:bg-slate-800 shadow-2xl shadow-gray-900/10 dark:shadow-black/30 py-2 overflow-hidden">
+                      <div className="px-4 py-3.5 border-b border-gray-100 dark:border-slate-700/50">
+                        <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{user.fullName}</p>
+                        <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate mt-0.5">{user.email}</p>
+                      </div>
+                      <Link
+                        href="/profile"
+                        onClick={() => setProfileOpen(false)}
+                        className="flex items-center gap-3 px-4 py-2.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 hover:text-premium-blue dark:hover:text-premium-gold transition-colors"
                       >
-                        <LogOut className="h-4 w-4" />
-                        Sign Out
-                      </button>
+                        <User className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+                        Profile Settings
+                      </Link>
+                      <div className="border-t border-gray-50 dark:border-slate-700/30 mt-1 pt-1">
+                        <button
+                          onClick={handleLogout}
+                          className="flex w-full items-center gap-3 px-4 py-2.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                        >
+                          <LogOut className="h-4 w-4" />
+                          Sign Out
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex items-center gap-2.5">
-                <Button asChild variant="outline" size="sm" className="h-9 text-xs font-semibold rounded-xl px-5 border-premium-blue/25 dark:border-premium-blue/40 text-premium-blue dark:text-premium-gold hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 hover:border-premium-blue/50 dark:hover:border-premium-gold/50 transition-all duration-200 active:scale-95 shadow-sm hover:shadow-md">
-                  <Link href="/auth/login">Login</Link>
-                </Button>
-                <Button asChild size="sm" className="h-9 text-xs font-semibold rounded-xl px-5 bg-gradient-to-r from-premium-blue via-premium-blue to-premium-dark text-white shadow-lg shadow-premium-blue/25 hover:shadow-xl hover:shadow-premium-blue/30 hover:scale-105 active:scale-95 transition-all duration-200 hover:from-premium-blue hover:to-premium-dark relative overflow-hidden group/cta">
-                  <span className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent_60%)] opacity-0 group-hover/cta:opacity-100 transition-opacity duration-300" />
-                  <Link href="/auth/register" className="relative z-10 flex items-center gap-1.5">
-                    Open Account
-                    <Sparkles className="h-3 w-3 opacity-70 group-hover/cta:opacity-100 group-hover/cta:rotate-12 transition-all duration-300" />
-                  </Link>
-                </Button>
-                <button
-                  onClick={() => setMobileDrawerOpen(true)}
-                  aria-label="Open menu"
-                  className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl text-gray-500 dark:text-gray-400 hover:text-premium-blue dark:hover:text-premium-gold hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 active:scale-90 transition-all duration-200"
-                >
-                  <Menu className="h-5 w-5" />
-                </button>
-              </div>
-            )}
+                  )}
+                </div>
+              ) : (
+                <>
+                  <Button asChild variant="outline" size="sm" className="h-9 text-xs font-semibold rounded-xl px-5 border-premium-blue/25 dark:border-premium-blue/40 text-premium-blue dark:text-premium-gold hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 hover:border-premium-blue/50 dark:hover:border-premium-gold/50 transition-all duration-200 active:scale-95 shadow-sm hover:shadow-md">
+                    <Link href="/auth/login">Login</Link>
+                  </Button>
+                  <Button asChild size="sm" className="h-9 text-xs font-semibold rounded-xl px-5 bg-gradient-to-r from-premium-blue via-premium-blue to-premium-dark text-white shadow-lg shadow-premium-blue/25 hover:shadow-xl hover:shadow-premium-blue/30 hover:scale-105 active:scale-95 transition-all duration-200 hover:from-premium-blue hover:to-premium-dark relative overflow-hidden group/cta">
+                    <span className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.2),transparent_60%)] opacity-0 group-hover/cta:opacity-100 transition-opacity duration-300" />
+                    <Link href="/auth/register" className="relative z-10 flex items-center gap-1.5">
+                      Open Account
+                      <Sparkles className="h-3 w-3 opacity-70 group-hover/cta:opacity-100 group-hover/cta:rotate-12 transition-all duration-300" />
+                    </Link>
+                  </Button>
+                </>
+              )}
+            </div>
 
-            {/* Mobile menu button (when logged in) */}
-            {isAuthenticated && (
-              <button
-                onClick={() => setMobileDrawerOpen(true)}
-                aria-label="Open menu"
-                className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl text-gray-500 dark:text-gray-400 hover:text-premium-blue dark:hover:text-premium-gold hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 active:scale-90 transition-all duration-200"
-              >
-                <Menu className="h-5 w-5" />
-              </button>
-            )}
+            {/* Hamburger menu - mobile only */}
+            <button
+              onClick={() => setMobileDrawerOpen(true)}
+              aria-label="Open menu"
+              className="lg:hidden flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl text-gray-500 dark:text-gray-400 hover:text-premium-blue dark:hover:text-premium-gold hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 active:scale-90 transition-all duration-200"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
           </div>
         </div>
       </header>
 
       {/* Search Modal */}
       {searchOpen && (
-        <div className="fixed inset-0 z-[60] flex items-start justify-center pt-24 sm:pt-32 px-4" onClick={() => { setSearchOpen(false); setSearchQuery(''); }}>
+        <div className="fixed inset-0 z-[60] flex items-start justify-center pt-16 sm:pt-20 px-4" onClick={() => { setSearchOpen(false); setSearchQuery(''); }}>
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
           <div
             ref={searchRef}
-            className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl shadow-black/10 overflow-hidden"
+            className="relative w-full max-w-2xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl shadow-black/10 overflow-hidden animate-fade-in-scale"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3.5 px-6 py-5 border-b border-gray-100 dark:border-slate-700/50">
@@ -604,12 +600,12 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
       {mobileDrawerOpen && (
         <div className="fixed inset-0 z-[70] lg:hidden">
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm animate-fade-in"
             onClick={() => setMobileDrawerOpen(false)}
           />
-          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-slate-900 shadow-2xl shadow-black/10 overflow-y-auto">
+          <div className="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-slate-900 shadow-2xl shadow-black/10 overflow-y-auto animate-slide-in-right">
             {/* Drawer Header */}
-            <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 dark:border-slate-800">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100 dark:border-slate-800">
               <Link href="/" onClick={() => setMobileDrawerOpen(false)} className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-premium-blue to-premium-dark text-white font-bold text-[10px] shadow-lg shadow-premium-blue/20">
                   SBI
@@ -627,6 +623,21 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
                 <X className="h-5 w-5" />
               </button>
             </div>
+
+            {/* User Info (when logged in) */}
+            {isAuthenticated && user && (
+              <div className="mx-4 mt-4 flex items-center gap-3.5 px-4 py-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+                <Avatar className="h-10 w-10 ring-2 ring-premium-blue/20 dark:ring-premium-gold/30">
+                  <AvatarFallback className="bg-gradient-to-br from-premium-blue to-premium-dark text-white text-xs font-semibold">
+                    {getInitials(user.fullName)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{user.fullName}</p>
+                  <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">{user.email}</p>
+                </div>
+              </div>
+            )}
 
             {/* Mobile Nav Items */}
             <div className="px-4 py-4 space-y-1">
@@ -668,7 +679,7 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
                       )}
                     </Link>
                     {hasMega && expanded && (
-                      <div className="ml-5 pl-5 border-l-2 border-premium-blue/20 dark:border-premium-gold/20 space-y-0.5 pb-1 mt-0.5">
+                      <div className="ml-5 pl-5 border-l-2 border-premium-blue/20 dark:border-premium-gold/20 space-y-0.5 pb-1 mt-0.5 overflow-hidden animate-fade-in-down">
                         {item.megaMenu!.map((sub) => (
                           <Link
                             key={sub.title}
@@ -710,27 +721,36 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
                     <Link href="/auth/register" onClick={() => setMobileDrawerOpen(false)}>Open Account</Link>
                   </Button>
 
-                  {/* Secure Badge (mobile) */}
                   <div className="flex items-center justify-center gap-2 mt-4 px-4 py-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-800/30">
                     <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
                     <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-300">256-bit Secure Banking</span>
                   </div>
                 </>
               ) : (
-                <div className="flex items-center gap-3.5 px-4 py-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
-                  <Avatar className="h-10 w-10 ring-2 ring-premium-blue/20 dark:ring-premium-gold/30">
-                    <AvatarFallback className="bg-gradient-to-br from-premium-blue to-premium-dark text-white text-xs font-semibold">
-                      {getInitials(user!.fullName)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{user!.fullName}</p>
-                    <p className="text-[10px] text-gray-400 dark:text-gray-500 truncate">{user!.email}</p>
-                  </div>
+                <div className="pt-2">
+                  <Link
+                    href="/profile"
+                    onClick={() => setMobileDrawerOpen(false)}
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-premium-blue/5 dark:hover:bg-premium-blue/10 transition-colors"
+                  >
+                    <User className="h-4 w-4 text-gray-400" />
+                    Profile Settings
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Sign Out
+                  </button>
                 </div>
               )}
-              <div className="flex items-center justify-between px-4 py-2">
-                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Dark Mode</span>
+
+              <div className="flex items-center justify-between px-4 py-3 rounded-xl bg-gray-50 dark:bg-slate-800/50">
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                  {theme === 'dark' ? <Sun className="h-4 w-4 inline mr-2" /> : <Moon className="h-4 w-4 inline mr-2" />}
+                  Dark Mode
+                </span>
                 <button
                   onClick={toggleTheme}
                   className={cn(

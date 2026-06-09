@@ -32,8 +32,12 @@
 }
 
 @layer base {
+  html {
+    scroll-padding-top: 64px;
+  }
   body {
     @apply bg-gray-50 text-sbi-950 antialiased;
+    overflow-x: hidden;
   }
 }
 
