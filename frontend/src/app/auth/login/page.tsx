@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -47,8 +48,11 @@ export default function LoginPage() {
     <div className="min-h-screen gradient-primary flex items-center justify-center p-4">
       <div className="w-full max-w-md animate-fade-in">
         <Link href="/" className="flex items-center justify-center gap-2 mb-8">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20 text-white font-bold">SBI</div>
-          <span className="text-xl font-bold text-white">SBI Banking</span>
+          <Image src="/image/logo.png" alt="SBI Finance" width={40} height={40} className="h-10 w-10 rounded-lg object-contain" />
+          <div className="flex flex-col leading-tight">
+            <span className="text-xl font-bold text-white">SBI Finance</span>
+            <span className="text-[10px] font-medium text-white/70 -mt-0.5">State Bank of India</span>
+          </div>
         </Link>
 
         <Card className="border-0 shadow-2xl">

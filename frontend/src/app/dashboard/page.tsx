@@ -458,7 +458,8 @@ function CreditCardSection() {
 
 // ────────────── UPI SECTION ──────────────
 
-function UPISection() {
+function UPISection({ accounts }: { accounts: any[] }) {
+  const [fromAccount, setFromAccount] = useState('');
   const [recipient, setRecipient] = useState('');
   const [sendAmount, setSendAmount] = useState('');
   const { addToast } = useToast();
@@ -475,6 +476,10 @@ function UPISection() {
     },
   });
   const handleSendNow = () => {
+    if (!fromAccount) {
+      addToast({ title: 'Please select a source account', variant: 'error' });
+      return;
+    }
     if (!recipient) {
       addToast({ title: 'Please enter a UPI ID or account number', variant: 'error' });
       return;
@@ -484,7 +489,7 @@ function UPISection() {
       addToast({ title: 'Please select or enter a valid amount', variant: 'error' });
       return;
     }
-    transferMutation.mutate({ toAccount: recipient, amount: amt, description: 'UPI Payment' });
+    transferMutation.mutate({ fromAccount, toAccount: recipient, toName: 'UPI Transfer', amount: amt, transactionType: 'neft', description: 'UPI Payment' });
   };
   return (
     <div className="grid sm:grid-cols-3 gap-3 sm:gap-4">
@@ -514,6 +519,15 @@ function UPISection() {
             <p className="text-[10px] text-sbi-400 dark:text-sbi-500">Instant UPI Transfer</p>
           </div>
         </div>
+        <select value={fromAccount} onChange={(e) => setFromAccount(e.target.value)}
+          className="flex h-9 w-full rounded-md border border-sbi-200 dark:border-sbi-700 bg-white/80 dark:bg-sbi-800/80 px-3 py-1 text-xs shadow-sm mb-3">
+          <option value="">Select source account</option>
+          {accounts.map((acc: any) => (
+            <option key={acc._id} value={acc.accountNumber}>
+              {acc.accountType.toUpperCase()} - {acc.accountNumber} (₹{acc.balance.toLocaleString()})
+            </option>
+          ))}
+        </select>
         <Input placeholder="Enter UPI ID / Mobile / Account" value={recipient} onChange={(e) => setRecipient(e.target.value)}
           className="h-9 text-xs rounded-xl border-sbi-200 dark:border-sbi-700 bg-white/80 dark:bg-sbi-800/80 mb-3" />
         <div className="grid grid-cols-3 gap-1.5 mb-3">
@@ -1000,7 +1014,7 @@ export default function DashboardIndex() {
       <HeroSection accounts={accounts} totalBalance={totalBalance} />
       <AccountOverview accounts={accounts} />
       <CreditCardSection />
-      <UPISection />
+      <UPISection accounts={accounts} />
       <RecentTransactions />
       <AnalyticsSection />
       <SecuritySection />

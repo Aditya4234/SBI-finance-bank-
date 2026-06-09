@@ -223,6 +223,12 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
               height={36}
               className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl object-contain"
             />
+            <div className="flex flex-col leading-tight">
+              <span className="text-sm sm:text-base font-bold text-premium-dark dark:text-white tracking-tight">SBI Finance</span>
+              <span className="hidden sm:block text-[9px] sm:text-[10px] font-medium text-gray-400 dark:text-gray-500 -mt-0.5 tracking-wide">
+                State Bank of India
+              </span>
+            </div>
           </Link>
 
           {/* Center: Desktop Nav */}
@@ -614,6 +620,10 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
                   height={36}
                   className="h-9 w-9 rounded-xl object-contain"
                 />
+                <div className="flex flex-col leading-tight">
+                  <span className="text-sm font-bold text-premium-dark dark:text-white">SBI Finance</span>
+                  <span className="text-[9px] font-medium text-gray-400 dark:text-gray-500 -mt-0.5">State Bank of India</span>
+                </div>
               </Link>
               <button
                 onClick={() => setMobileDrawerOpen(false)}
