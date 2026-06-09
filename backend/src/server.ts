@@ -25,7 +25,7 @@ const corsOptions: cors.CorsOptions = {
     if (!origin || config.corsOrigins.includes(origin) || config.nodeEnv === 'development') {
       callback(null, true);
     } else {
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
+      callback(null, false);
     }
   },
   credentials: true,
