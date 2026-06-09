@@ -29,7 +29,10 @@ export const config = {
     pass: process.env.SMTP_PASS || '',
     from: process.env.EMAIL_FROM || 'noreply@sbi.com',
   },
-  corsOrigins: (process.env.CORS_ORIGIN || 'http://localhost:3000,http://localhost:5173,https://sbi-finance-bank.vercel.app').split(',').map(s => s.trim()),
+  corsOrigins: [
+    ...(process.env.CORS_ORIGIN || 'http://localhost:3000,http://localhost:5173').split(',').map(s => s.trim()),
+    'https://sbi-finance-bank.vercel.app',
+  ],
   corsAllowedMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   corsAllowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'x-device-id', 'x-device-name', 'x-correlation-id'],
   corsExposedHeaders: ['x-correlation-id', 'x-request-id'],
