@@ -3,7 +3,7 @@ import { logger } from '../config/logger';
 import { AppError } from '../utils/errors';
 import { ApiResponse } from '../types';
 
-export const errorHandler = (err: Error, _req: Request, res: Response<ApiResponse>, _next: NextFunction) => {
+export const errorHandler = (err: Error, req: Request, res: Response<ApiResponse>, _next: NextFunction) => {
   logger.error('Error:', err);
 
   if (err instanceof AppError) {
@@ -43,7 +43,7 @@ export const errorHandler = (err: Error, _req: Request, res: Response<ApiRespons
   });
 };
 
-export const notFoundHandler = (_req: Request, res: Response) => {
+export const notFoundHandler = (req: Request, res: Response) => {
   res.status(404).json({
     success: false,
     message: 'Route not found',

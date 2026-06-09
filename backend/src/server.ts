@@ -1,5 +1,5 @@
 import 'express-async-errors';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -19,27 +19,70 @@ import { registerEventHandlers } from './events/handlers';
 
 const app = express();
 
-app.use(helmet());
-app.use(cors({
+// --- CORS header injection at the HTTP layer (catches EVERY response) ---
+function corsHeaderMiddleware(req: Request, res: Response, next: NextFunction) {
+  const origin = req.headers.origin;
+  const setCorsHeaders = () => {
+    if (origin && config.corsOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    } else if (config.nodeEnv === 'development' && origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
+    res.setHeader('Access-Control-Allow-Methods', config.corsAllowedMethods.join(', '));
+    res.setHeader('Access-Control-Allow-Headers', config.corsAllowedHeaders.join(', '));
+    res.setHeader('Access-Control-Expose-Headers', config.corsExposedHeaders.join(', '));
+  };
+  const _originalWriteHead = res.writeHead.bind(res) as any;
+  res.writeHead = function (statusCode: number, ...args: any[]) {
+    setCorsHeaders();
+    return _originalWriteHead(statusCode, ...args);
+  };
+  next();
+}
+
+app.use(corsHeaderMiddleware);
+
+// --- CORS package (handles OPTIONS preflight and origin validation) ---
+const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
-    if (!origin || config.corsOrigins.includes(origin)) {
+    if (!origin || config.corsOrigins.includes(origin) || config.nodeEnv === 'development') {
       callback(null, true);
     } else {
       callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
   credentials: true,
-}));
+  methods: config.corsAllowedMethods,
+  allowedHeaders: config.corsAllowedHeaders,
+  exposedHeaders: config.corsExposedHeaders,
+  maxAge: 86400,
+};
+
+app.use(cors(corsOptions));
+
+// Explicit global OPTIONS handler for preflight requests
+app.options('*', cors(corsOptions));
+
+// --- Security headers ---
+app.use(helmet());
+
+// --- Body parsing ---
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// --- Request context & tracking ---
 app.use(correlationId);
 app.use(deviceTracking);
 app.use(requestLogger);
 
+// --- Routes behind rate limiter ---
 app.use('/api', apiLimiter);
 app.use('/api', routes);
 
+// --- Error handling (last) ---
 app.use(notFoundHandler);
 app.use(errorHandler);
 

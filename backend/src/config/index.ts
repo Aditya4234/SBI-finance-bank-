@@ -30,6 +30,9 @@ export const config = {
     from: process.env.EMAIL_FROM || 'noreply@sbi.com',
   },
   corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:3000',
-  corsOrigins: (process.env.CORS_ORIGIN || 'http://localhost:3000').split(',').map(s => s.trim()),
+  corsOrigins: (process.env.CORS_ORIGIN || 'http://localhost:3000,http://localhost:5173').split(',').map(s => s.trim()),
+  corsAllowedMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  corsAllowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'x-device-id', 'x-device-name', 'x-correlation-id'],
+  corsExposedHeaders: ['x-correlation-id', 'x-request-id'],
   encryptionKey: process.env.ENCRYPTION_KEY || 'default-encryption-key-32chr',
 };
