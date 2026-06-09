@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTheme } from './ThemeProvider';
 import { Button } from './ui/button';
@@ -215,16 +216,13 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
             href={isAuthenticated && isOnDashboard ? '/dashboard' : '/'}
             className="flex items-center gap-2 sm:gap-3 shrink-0 group/logo relative"
           >
-            <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl bg-gradient-to-br from-premium-blue via-premium-blue to-premium-dark text-white font-bold text-[11px] sm:text-xs shadow-lg shadow-premium-blue/20 group-hover/logo:shadow-xl group-hover/logo:shadow-premium-blue/30 group-hover/logo:scale-105 transition-all duration-300">
-              <span className="relative z-10 tracking-tight">SBI</span>
-              <div className="absolute inset-0 rounded-xl bg-white/0 group-hover/logo:bg-white/10 transition-colors" />
-            </div>
-            <div className="flex flex-col leading-tight">
-              <span className="text-sm sm:text-base font-bold text-premium-dark dark:text-white tracking-tight">SBI Finance</span>
-              <span className="hidden sm:block text-[9px] sm:text-[10px] font-medium text-gray-400 dark:text-gray-500 -mt-0.5 tracking-wide">
-                State Bank of India
-              </span>
-            </div>
+            <Image
+              src="/image/logo.png"
+              alt="SBI Finance"
+              width={36}
+              height={36}
+              className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl object-contain"
+            />
           </Link>
 
           {/* Center: Desktop Nav */}
@@ -609,13 +607,13 @@ export function Header({ onSidebarToggle }: HeaderProps = {}) {
             {/* Drawer Header */}
             <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100 dark:border-slate-800">
               <Link href="/" onClick={() => setMobileDrawerOpen(false)} className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-premium-blue to-premium-dark text-white font-bold text-[10px] shadow-lg shadow-premium-blue/20">
-                  SBI
-                </div>
-                <div className="flex flex-col leading-tight">
-                  <span className="text-sm font-bold text-premium-dark dark:text-white">SBI Finance</span>
-                  <span className="text-[9px] font-medium text-gray-400 dark:text-gray-500 -mt-0.5">State Bank of India</span>
-                </div>
+                <Image
+                  src="/image/logo.png"
+                  alt="SBI Finance"
+                  width={36}
+                  height={36}
+                  className="h-9 w-9 rounded-xl object-contain"
+                />
               </Link>
               <button
                 onClick={() => setMobileDrawerOpen(false)}

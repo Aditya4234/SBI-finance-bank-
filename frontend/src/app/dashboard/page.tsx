@@ -227,11 +227,11 @@ function HeroSection({ accounts, totalBalance }: { accounts: any[]; totalBalance
                 <span>+12.5%</span>
               </div>
             </div>
-            <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">{f(totalBalance + 500000)}</p>
+            <p className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">{f(totalBalance)}</p>
           </div>
-          <StatBadge label="Savings" value={f(savings?.balance || 425000)} icon={Building2} />
-          <StatBadge label="Current" value={f(current?.balance || 180000)} icon={Briefcase} />
-          <StatBadge label="Fixed Deposit" value={f(fd?.balance || 500000)} icon={CircleDollarSign} />
+          <StatBadge label="Savings" value={f(savings?.balance || 0)} icon={Building2} />
+          <StatBadge label="Current" value={f(current?.balance || 0)} icon={Briefcase} />
+          <StatBadge label="Fixed Deposit" value={f(fd?.balance || 0)} icon={CircleDollarSign} />
           <StatBadge label="Last Login" value={lastLogin} icon={Clock} color="text-amber-300" />
         </div>
 
@@ -268,19 +268,19 @@ function AccountOverview({ accounts }: { accounts: any[] }) {
 
   const cards = [
     {
-      title: 'Savings Account', balance: savings?.balance || 425000, accNum: savings?.accountNumber || 'XXXX8956',
+      title: 'Savings Account', balance: savings?.balance || 0, accNum: savings?.accountNumber || '',
       icon: Building2, gradient: 'from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20',
       ring: 'ring-blue-200 dark:ring-blue-700', actions: ['Transfer', 'Statement'],
       trend: trend(true, '+₹3,200 this month'), bgIcon: 'text-blue-200 dark:text-blue-800',
     },
     {
-      title: 'Current Account', balance: current?.balance || 180000, accNum: current?.accountNumber || 'XXXX3421',
+      title: 'Current Account', balance: current?.balance || 0, accNum: current?.accountNumber || '',
       icon: Briefcase, gradient: 'from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20',
       ring: 'ring-emerald-200 dark:ring-emerald-700', actions: ['Transfer', 'Statement'],
       trend: trend(true, '+₹1,500 this month'), bgIcon: 'text-emerald-200 dark:text-emerald-800',
     },
     {
-      title: 'Fixed Deposit', balance: fd?.balance || 500000, accNum: fd?.accountNumber || 'FD-XX-7890',
+      title: 'Fixed Deposit', balance: fd?.balance || 0, accNum: fd?.accountNumber || '',
       icon: CircleDollarSign, gradient: 'from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20',
       ring: 'ring-amber-200 dark:ring-amber-700', actions: ['Renew', 'Break FD'],
       trend: trend(true, '5.5% p.a. - ₹2,290 interest'), bgIcon: 'text-amber-200 dark:text-amber-800',
