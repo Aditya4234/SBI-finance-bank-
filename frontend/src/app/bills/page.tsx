@@ -66,7 +66,7 @@ export default function BillsPage() {
   const { data: pendingRes } = useQuery({ queryKey: ['bill-pending'], queryFn: () => billPaymentApi.getPending() });
 
   const accounts = accountsRes?.data?.data || [];
-  const history = historyRes?.data?.data || [];
+  const history = historyRes?.data?.data?.bills || [];
   const pendingBills = pendingRes?.data?.data || [];
 
   const payBillMutation = useMutation({
